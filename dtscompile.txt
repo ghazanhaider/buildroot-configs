@@ -1,0 +1,1 @@
+cpp -nostdinc -I /root/buildroot-2023.02.1/output/build/linux-6.1.26/include -I /root/buildroot-2023.02.1/output/build/linux-6.1.26/arch -I /root/buildroot-2023.02.1/output/build/linux-6.1.26/arch/arm/boot/dts/ -undef -x assembler-with-cpp  fixedv2.dts fixedv2.dts.preprocessed
