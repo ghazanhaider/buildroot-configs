@@ -51,7 +51,7 @@ bootm 0x22000000 - 0x22700000
 The mw.l lines write to reset controller registers to reset peripherals using the NRST pin but not the CPU, which resets the ethernet phy and makes it available. Looks like there's code in both U-Boot and the Linux kernel to do this but I haven't figured it out.
 
 
-Bonus: 
+### Bonus: 
 
 The `debian-armel.yaml` can be fed into this code (https://github.com/laroche/arm-devel-infrastructure) to produce a debian image which can be written to a USB stick (root=/dev/sda2). Issues with this:
 
@@ -59,3 +59,30 @@ The `debian-armel.yaml` can be fed into this code (https://github.com/laroche/ar
 - 64MB isn't enough for apt update. You might need swap somewhere, or manually download deb files for any extra packages
 - I haven't setup swap or removed the swap entry in fstab and this causes a panic with systemd. 
 
+
+
+## AT91SAM9261-EK
+
+- Git clone buildroot (2023.05 was used here)
+- br-config becomes the .config at the root of this buildroot
+- linux-config becomes output/build/linux-6.3.8/.config
+- uboot-config becomes output/build/uboot-2022.04/.config
+- uclibc-config becomes output/build/uclibc-1.0.43/.config
+- at91bootstrap-config beomces output/build/at91bootstrap3-v3.10.3/.config
+
+Notes: 
+- AT91Bootstrap3 should be configured to boot from Dataflash and write it to Dataflash (address 0x0).
+- UBoot and Kernel can both be written to NAND in the usual spots
+
+Make all
+
+TODO Fixes:
+- I have the rev 0.006 board. The Errata for the chip says that it can only boot from Dataflash with no workarounds.
+- There's a jumper J21 that selects between SD card and Dataflash.
+- To boot from an SD card, I must have this jumper at 1-2 during boot to UBoot, then switch to 2-3 before kernel boot so that an SD card can be used.
+- The clock for SPI conflicts with the clock for MMC0. I've disabled SPI which disables Linux kernel's access to the Dataflash as well as to the touch controller. Maybe a fix here is to use the SD card using SPI mode and ignore MMC0?
+- Need to also test J21 set to connect 1-2-3 to see if everything will work, I suspect not.
+- Also Davicom DM9000 driver is compiled in but the DTS does not have it in. Need to check how to configure it in the DTS (EBI CS configure? Interrupt pin configure?) before use.
+
+
+Do not use the stock dts/dtb file, use this at91sam9261ek.dts.
