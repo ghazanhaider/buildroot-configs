@@ -1,7 +1,7 @@
-# 0 "at91sam9261ek/at91sam9261ek.dts"
+# 0 "at91sam9261ek.dts"
 # 0 "<built-in>"
 # 0 "<command-line>"
-# 1 "at91sam9261ek/at91sam9261ek.dts"
+# 1 "at91sam9261ek.dts"
 
 
 
@@ -9,7 +9,7 @@
 
 
 /dts-v1/;
-# 1 "/root/buildroot/output/build/linux-6.3.8/arch/arm/boot/dts/at91sam9261.dtsi" 1
+# 1 "at91sam9261.dtsi" 1
 
 
 
@@ -17,16 +17,14 @@
 
 
 
-# 1 "/root/buildroot/output/build/linux-6.3.8/include/dt-bindings/pinctrl/at91.h" 1
-# 9 "/root/buildroot/output/build/linux-6.3.8/arch/arm/boot/dts/at91sam9261.dtsi" 2
-# 1 "/root/buildroot/output/build/linux-6.3.8/include/dt-bindings/interrupt-controller/irq.h" 1
-# 10 "/root/buildroot/output/build/linux-6.3.8/arch/arm/boot/dts/at91sam9261.dtsi" 2
-# 1 "/root/buildroot/output/build/linux-6.3.8/include/dt-bindings/gpio/gpio.h" 1
-# 11 "/root/buildroot/output/build/linux-6.3.8/arch/arm/boot/dts/at91sam9261.dtsi" 2
-# 1 "/root/buildroot/output/build/linux-6.3.8/include/dt-bindings/clock/at91.h" 1
-# 12 "/root/buildroot/output/build/linux-6.3.8/arch/arm/boot/dts/at91sam9261.dtsi" 2
-# 1 "/root/buildroot/output/build/linux-6.3.8/include/dt-bindings/mfd/at91-usart.h" 1
-# 13 "/root/buildroot/output/build/linux-6.3.8/arch/arm/boot/dts/at91sam9261.dtsi" 2
+# 1 "/root/buildroot/output/build/linux-headers-6.4.1/include/dt-bindings/pinctrl/at91.h" 1
+# 9 "at91sam9261.dtsi" 2
+# 1 "/root/buildroot/output/build/linux-headers-6.4.1/include/dt-bindings/interrupt-controller/irq.h" 1
+# 10 "at91sam9261.dtsi" 2
+# 1 "/root/buildroot/output/build/linux-headers-6.4.1/include/dt-bindings/gpio/gpio.h" 1
+# 11 "at91sam9261.dtsi" 2
+# 1 "/root/buildroot/output/build/linux-headers-6.4.1/include/dt-bindings/clock/at91.h" 1
+# 12 "at91sam9261.dtsi" 2
 
 / {
  #address-cells = <1>;
@@ -197,7 +195,6 @@
    usart0: serial@fffb0000 {
     compatible = "atmel,at91sam9260-usart";
     reg = <0xfffb0000 0x200>;
-    atmel,usart-mode = <0>;
     interrupts = <6 4 5>;
     atmel,use-dma-rx;
     atmel,use-dma-tx;
@@ -211,7 +208,6 @@
    usart1: serial@fffb4000 {
     compatible = "atmel,at91sam9260-usart";
     reg = <0xfffb4000 0x200>;
-    atmel,usart-mode = <0>;
     interrupts = <7 4 5>;
     atmel,use-dma-rx;
     atmel,use-dma-tx;
@@ -225,7 +221,6 @@
    usart2: serial@fffb8000{
     compatible = "atmel,at91sam9260-usart";
     reg = <0xfffb8000 0x200>;
-    atmel,usart-mode = <0>;
     interrupts = <8 4 5>;
     atmel,use-dma-rx;
     atmel,use-dma-tx;
@@ -322,7 +317,6 @@
    dbgu: serial@fffff200 {
     compatible = "atmel,at91sam9260-dbgu", "atmel,at91sam9260-usart";
     reg = <0xfffff200 0x200>;
-    atmel,usart-mode = <0>;
     interrupts = <1 4 7>;
     pinctrl-names = "default";
     pinctrl-0 = <&pinctrl_dbgu>;
@@ -625,7 +619,7 @@
     clock-names = "slow_xtal", "main_xtal";
    };
 
-   reset-controller@fffffd00 {
+   rstc@fffffd00 {
     compatible = "atmel,at91sam9260-rstc";
     reg = <0xfffffd00 0x10>;
     clocks = <&slow_xtal>;
@@ -682,7 +676,7 @@
   status = "disabled";
  };
 };
-# 9 "at91sam9261ek/at91sam9261ek.dts" 2
+# 9 "at91sam9261ek.dts" 2
 
 / {
  model = "Atmel at91sam9261ek";
@@ -747,6 +741,32 @@
   ebi: ebi@10000000 {
    status = "okay";
 
+   eth0: ethernet@2 {
+    interrupt-parent = <&pioC>;
+    interrupts = <11 4>;
+    reset-gpios = <&pioC 10 0>;
+    local-mac-address = [02 23 45 67 89 AB];
+    compatible = "davicom,dm9000";
+    davicom,no-eeprom;
+    reg = <0x2 0x0 0x2 0x2 0x04 0x2>;
+    pinctrl-names = "default";
+    pinctrl-0 = <&eth0_irq>;
+    atmel,smc-read-mode = "nrd";
+    atmel,smc-write-mode = "nwe";
+    atmel,smc-bus-width = <16>;
+    atmel,smc-ncs-rd-setup-ns = <20>;
+    atmel,smc-nrd-setup-ns = <20>;
+    atmel,smc-ncs-wr-setup-ns = <20>;
+    atmel,smc-nwe-setup-ns = <20>;
+    atmel,smc-ncs-rd-pulse-ns = <80>;
+    atmel,smc-nrd-pulse-ns = <80>;
+    atmel,smc-ncs-wr-pulse-ns = <80>;
+    atmel,smc-nwe-pulse-ns = <80>;
+    atmel,smc-nwe-cycle-ns = <120>;
+    atmel,smc-nrd-cycle-ns = <120>;
+    atmel,smc-tdf-ns = <12>;
+   };
+
    nand_controller: nand-controller {
     status = "okay";
     pinctrl-0 = <&pinctrl_nand_cs &pinctrl_nand_rb>;
@@ -801,6 +821,19 @@
   };
 
   apb {
+                        pinctrl@fffff400 {
+                                eth {
+                                        eth0_irq: eth0-irq {
+                                                atmel,pins = <2 11 0 (0 << 0)>;
+      bias-disable;
+                                        };
+                                };
+
+    usart0 {
+     /delete-node/ usart0_cts-0;
+    };
+   };
+
    tcb0: timer@fffa0000 {
     timer0: timer@0 {
      compatible = "atmel,tcb-timer";

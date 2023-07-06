@@ -70,6 +70,32 @@
 		ebi: ebi@10000000 {
 			status = "okay";
 
+			eth0: ethernet@2 {
+				interrupt-parent = <&pioC>;
+				interrupts = <11 IRQ_TYPE_LEVEL_HIGH>;
+				reset-gpios = <&pioC 10 0>;
+				local-mac-address = [02 23 45 67 89 AB];
+				compatible = "davicom,dm9000";
+				davicom,no-eeprom;
+				reg = <0x2 0x0 0x2 0x2 0x04 0x2>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&eth0_irq>;
+				atmel,smc-read-mode = "nrd";
+				atmel,smc-write-mode = "nwe";
+				atmel,smc-bus-width = <16>;
+				atmel,smc-ncs-rd-setup-ns = <20>;
+				atmel,smc-nrd-setup-ns = <20>;
+				atmel,smc-ncs-wr-setup-ns = <20>;
+				atmel,smc-nwe-setup-ns = <20>;
+				atmel,smc-ncs-rd-pulse-ns = <80>;
+				atmel,smc-nrd-pulse-ns = <80>;
+				atmel,smc-ncs-wr-pulse-ns = <80>;
+				atmel,smc-nwe-pulse-ns = <80>;
+				atmel,smc-nwe-cycle-ns = <120>;
+				atmel,smc-nrd-cycle-ns = <120>;
+				atmel,smc-tdf-ns = <12>;
+			};
+
 			nand_controller: nand-controller {
 				status = "okay";
 				pinctrl-0 = <&pinctrl_nand_cs &pinctrl_nand_rb>;
@@ -124,6 +150,19 @@
 		};
 
 		apb {
+                        pinctrl@fffff400 {
+                                eth {
+                                        eth0_irq: eth0-irq {
+                                                atmel,pins = <AT91_PIOC 11 AT91_PERIPH_GPIO AT91_PINCTRL_NONE>;
+						bias-disable;
+                                        };
+                                };
+
+				usart0 {
+					/delete-node/ usart0_cts-0;
+				};
+			};
+
 			tcb0: timer@fffa0000 {
 				timer0: timer@0 {
 					compatible = "atmel,tcb-timer";
