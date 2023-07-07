@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ -e $1 && -d $2]]
+if [[ -e $1 && -d $2 ]];
 then
 	cpp -nostdinc -I $2/include -I $2/arch -I $2/arch/arm/boot/dts/ -undef -x assembler-with-cpp  $1 $1.preprocessed
 	dtc -I dts -O dtb $1.preprocessed -o $1.dtb
