@@ -68,21 +68,25 @@ The `debian-armel.yaml` can be fed into this code (https://github.com/laroche/ar
 - linux-config becomes output/build/linux-6.3.8/.config
 - uboot-config becomes output/build/uboot-2022.04/.config
 - uclibc-config becomes output/build/uclibc-1.0.43/.config
-- at91bootstrap-config beomces output/build/at91bootstrap3-v3.10.3/.config
+- at91dataflashboot-config becomes output/build/at91dataflashboot-1.05/.config
+- IGNORE: at91bootstrap-config beomces output/build/at91bootstrap3-v3.10.3/.config
 
 Notes: 
-- AT91Bootstrap3 should be configured to boot from Dataflash and write it to Dataflash (address 0x0).
+- IGNORE: AT91Bootstrap3 should be configured to boot from Dataflash and write it to Dataflash (address 0x0).
+- Use at91dataflashboot-1.05 instead of AT91Bootstrap3 for this board
 - UBoot and Kernel can both be written to NAND in the usual spots
+- The interrupt pin for Ethernet (PC11) conflicts with CTS for usart0. You can only use non-hardware usart0 with ethernet
+- Do NOT configure Driver Model for Ethernet. That blocks DM9000.
+- You will not see a DM9000/Davicom ethernet option in uboot config, it is selected automatically by the board.
+
 
 Make all
 
 TODO Fixes:
 - I have the rev 0.006 board. The Errata for the chip says that it can only boot from Dataflash with no workarounds.
 - There's a jumper J21 that selects between SD card and Dataflash.
-- To boot from an SD card, I must have this jumper at 1-2 during boot to UBoot, then switch to 2-3 before kernel boot so that an SD card can be used.
+- To boot from an SD card, I must have jumper J21 at 1-2 during boot to UBoot.
 - The clock for SPI conflicts with the clock for MMC0. I've disabled SPI which disables Linux kernel's access to the Dataflash as well as to the touch controller. Maybe a fix here is to use the SD card using SPI mode and ignore MMC0?
-- Need to also test J21 set to connect 1-2-3 to see if everything will work, I suspect not.
-- Also Davicom DM9000 driver is compiled in but the DTS does not have it in. Need to check how to configure it in the DTS (EBI CS configure? Interrupt pin configure?) before use.
 
 
 Do not use the stock dts/dtb file, use this at91sam9261ek.dts.

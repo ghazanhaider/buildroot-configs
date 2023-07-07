@@ -160,9 +160,9 @@
                                         };
                                 };
 
-			/*	usart0 {
-					/delete-node/ usart0_cts-0;
-				}; */
+				usart0 {
+					/delete-node/ usart0_cts-0; // Pin conflicts with eth0-irq
+				}; 
 			};
 
 			tcb0: timer@fffa0000 {
