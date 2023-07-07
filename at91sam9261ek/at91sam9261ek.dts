@@ -3,6 +3,8 @@
  * at91sam9261ek.dts - Device Tree file for Atmel at91sam9261 reference board
  *
  *  Copyright (C) 2013 Jean-Jacques Hiblot <jjhiblot@traphandler.com>
+ *
+ *  Modified to actually work on the EK by Ghazan Haider on 20230706
  */
 /dts-v1/;
 #include "at91sam9261.dtsi"
@@ -12,7 +14,7 @@
 	compatible = "atmel,at91sam9261ek", "atmel,at91sam9261", "atmel,at91sam9";
 
 	chosen {
-		bootargs = "rootfstype=ubifs ubi.mtd=5 root=ubi0:rootfs rw";
+		bootargs = "console=ttyS0,115200 root=/dev/mmcblk0 rootfstype=ext4 ro rootwait";
 		stdout-path = "serial0:115200n8";
 	};
 
@@ -72,9 +74,9 @@
 
 			eth0: ethernet@2 {
 				interrupt-parent = <&pioC>;
-				interrupts = <11 IRQ_TYPE_LEVEL_HIGH>;
+				interrupts = <11 IRQ_TYPE_EDGE_BOTH>;
 				reset-gpios = <&pioC 10 0>;
-				local-mac-address = [02 23 45 67 89 AB];
+				local-mac-address = [92 61 DE AD BE EF];
 				compatible = "davicom,dm9000";
 				davicom,no-eeprom;
 				reg = <0x2 0x0 0x2 0x2 0x04 0x2>;
@@ -83,17 +85,17 @@
 				atmel,smc-read-mode = "nrd";
 				atmel,smc-write-mode = "nwe";
 				atmel,smc-bus-width = <16>;
-				atmel,smc-ncs-rd-setup-ns = <20>;
-				atmel,smc-nrd-setup-ns = <20>;
-				atmel,smc-ncs-wr-setup-ns = <20>;
-				atmel,smc-nwe-setup-ns = <20>;
-				atmel,smc-ncs-rd-pulse-ns = <80>;
-				atmel,smc-nrd-pulse-ns = <80>;
-				atmel,smc-ncs-wr-pulse-ns = <80>;
-				atmel,smc-nwe-pulse-ns = <80>;
-				atmel,smc-nwe-cycle-ns = <120>;
-				atmel,smc-nrd-cycle-ns = <120>;
-				atmel,smc-tdf-ns = <12>;
+				atmel,smc-ncs-rd-setup-ns = <0>;
+				atmel,smc-nrd-setup-ns = <5>;
+				atmel,smc-ncs-wr-setup-ns = <0>;
+				atmel,smc-nwe-setup-ns = <5>;
+				atmel,smc-ncs-rd-pulse-ns = <90>;
+				atmel,smc-nrd-pulse-ns = <30>;
+				atmel,smc-ncs-wr-pulse-ns = <90>;
+				atmel,smc-nwe-pulse-ns = <30>;
+				atmel,smc-nwe-cycle-ns = <130>;
+				atmel,smc-nrd-cycle-ns = <130>;
+				atmel,smc-tdf-ns = <5>;
 			};
 
 			nand_controller: nand-controller {
@@ -158,9 +160,9 @@
                                         };
                                 };
 
-				usart0 {
+			/*	usart0 {
 					/delete-node/ usart0_cts-0;
-				};
+				}; */
 			};
 
 			tcb0: timer@fffa0000 {
