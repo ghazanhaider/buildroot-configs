@@ -90,3 +90,42 @@ TODO Fixes:
 
 
 Do not use the stock dts/dtb file, use this at91sam9261ek.dts.
+
+
+
+## AT91SAM9G45-EKES
+
+- Git clone buildroot (2023.02.2 was used here)
+- Copy br-config to be .config at the root of this buildroot
+- make nconfig and save
+- Copy linux-config to output/build/linux-6.4.2/.config
+- Copy uboot-config to output/build/uboot-2022.04/.config
+- Copy uclibc-config to output/build/uclibc-1.0.43/.config
+- Copy at91bootstrap3-config to output/build/at91bootstrap3-v3.10.3/.config
+
+Make all
+
+- Use sam-ba 2.18 to write at91bootstrap.bin to the Dataflash at address 0
+- Use sam-ba to write u-boot.bin to Dataflash at 0x40000
+- Use sam-ba to write the kernel file uImage to the NAND device at 0x200000
+- Do not use the at91sam9m10g45ek.dtb file produced by the kernel, compile the one in this repository like so:
+```
+cd buildroot-configs
+./dtscompile.sh at91sam9G45ek/at91sam9m10g45ek.dts /root/buildroot/output/build/linux-6.4.2/
+# I had cloned buildroot to /root, please change this path to the correct location for you.
+# The modified dtb file is placed in the buildroot-configs/at91sam9G45ek/ folder 
+```
+- Use sam-ba to write this devicetree file at91sam9m10g45ek.dtb to NAND at 0x180000
+Write the image rootfs.ext2 to an SD card using dd or Balena (not to a partition but to the raw SD
+- Boot away
+
+Notes:
+- Framebuffer, ethernet works
+- Audio needs to be tested
+- The chip has a PIT timer but Linux prefers to use up two TCB timers to make it better (higher res). I have both compiled but it looks like the TCB pair is used, which takes away two timers from our applications but the kernel seems to run very nicely.
+- We cannot specify a MAC address in the devicetree because macb runs well without the ethernet-phy specified, so we'll need to put a MAC address in /etc/network/interfaces instead, or use the command macchanger after boot.
+- The ethernet on boot reports irq=POLLING but once it comes up looks like it is using IRQ 28, not sure why earlier it reports irq=POLLING
+- 9G45 has two DRAM regions 0x20000000 and 0x70000000. My board has both populated (MN6 MN7 and MN8 MN9)
+- The kernel is loaded into 0x70000000 and sees 128MB but doesnt yet see the other 128MB in 0x20000000
+- If you have a fix for this let me know.
+
