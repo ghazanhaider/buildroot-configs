@@ -125,7 +125,34 @@ Notes:
 - The chip has a PIT timer but Linux prefers to use up two TCB timers to make it better (higher res). I have both compiled but it looks like the TCB pair is used, which takes away two timers from our applications but the kernel seems to run very nicely.
 - We cannot specify a MAC address in the devicetree because macb runs well without the ethernet-phy specified, so we'll need to put a MAC address in /etc/network/interfaces instead, or use the command macchanger after boot.
 - The ethernet on boot reports irq=POLLING but once it comes up looks like it is using IRQ 28, not sure why earlier it reports irq=POLLING
+
+The two memory bank problem:
 - 9G45 has two DRAM regions 0x20000000 and 0x70000000. My board has both populated (MN6 MN7 and MN8 MN9)
-- The kernel is loaded into 0x70000000 and sees 128MB but doesnt yet see the other 128MB in 0x20000000
-- If you have a fix for this let me know.
+- If your board also has 4 DDR2 chips populated, enabled the second bank by adding line `select BOARD_HAS_2_BANKS` into file `board/at91sam9m10g45ek/Config.in.board` and then run make at91bootstrap3-menuconfig and set MEM_BANK to 0x70000000 and MEM_BANK2 to 0x20000000
+- AT91Bootstrap3 also only initializes the first memory bank. To fix this, edit this file `board/at91sam9m10g45ek/at91sam9m10g45ek.c`:
+```
+        /* DDRAM2 Controller initialize */
+        //ddram_initialize(AT91C_BASE_DDRSDRC, AT91C_DDRAM_BASE_ADDR, &ddramc_reg);
+        ddram_initialize(AT91C_BASE_DDRSDRC0, AT91C_BASE_CS6, &ddramc_reg);
+        ddram_initialize(AT91C_BASE_DDRSDRC1, AT91C_BASE_CS1, &ddramc_reg);
+```
+- To change the load address of a kernel, just run this command instead of recompiling everything (in the linux-6.4.2 folder):
+`mkimage -A arm -O linux -T kernel -C none -a 0x22000000 -e 0x22000000 -n "mykern" -d arch/arm/boot/zImage uImage`
+
+- You'll need to change the boot command to something like this:
+```
+mem=128M@0x70000000 mem=128M@0x20000000 console=ttyS0,115200 earlyprintk mtdparts=atmel_nand:256k(bootstrap)ro,512k(uboot)ro,256k(env),256k(env_redundant),256k(spare),512k(dtb),6M(kernel)ro,-(rootfs) root=/dev/mmcblk1 rootfstype=ext4 ro
+```
+
+- When it works, you see this during boot:
+```
+Zone ranges:
+  Normal   [mem 0x0000000020000000-0x0000000027ffffff]
+  HighMem  [mem 0x0000000028000000-0x0000000077ffffff]
+Movable zone start for each node
+Early memory node ranges
+  node   0: [mem 0x0000000020000000-0x0000000027ffffff]
+  node   0: [mem 0x0000000070000000-0x0000000077ffffff]
+```
+
 
