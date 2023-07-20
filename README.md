@@ -156,3 +156,56 @@ Early memory node ranges
 ```
 
 
+## SAM9x60-EK
+
+Notes:
+- Stock uBoot does not work for this board. Neither serial nor the timer works and throws continuous errors.
+- There's a fork of uBoot with updated drivers that works: https://github.com/linux4sam/u-boot-at91/tree/u-boot-2022.01-at91
+- I simply used Microchip's demo package, the uBoot in it: linux4sam-poky-sam9x60ek-headless-2023.04
+`https://www.linux4sam.org/bin/view/Linux4SAM/DemoArchive`
+- uBoot is bigger than 512KiB here in most cases, change the layout for uboot to be 768KiB and move the env slot, keep kernel at 0x200000
+- Use sam-ba 3.x. The workflow is very different from sam-ba 2.18. I modified a QML file to point to my files (I did not use an itb file)
+- Current measure device PAC1934 driver is not mainlined, it is in the linux4sam kernel:
+`https://github.com/linux4microchip/linux/blob/linux-6.1-mchp/drivers/iio/adc/pac1934.c`
+- However you can still read numbers from `/sys/bus/i2c/devices/1-0017/of_node/status`
+- PAC1710 has no driver in either kernels but its data can also be fetched through the i2c bus.
+- All other drivers are mainlined and work (LCD not personally tested)
+- I've not disabled the Watchdog in this bootloader, which means u-boot must boot the kernel in just a few seconds.
+- The kernel runs a thread *watchdogd* which keeps the watchdog alive, the userspace daemon and /etc/watchdog.conf is not configured
+- Since u-boot is from Microchip's demo, it tries to boot the kernel through *bootz* which fails, we need *bootm*. So bootcmd and bootargs are both reconfigured in u-boot-env.bin.
+- The args are in ubootenv.txt
+- Run this command to produce the u-boot-env.bin image (and copy it to the sam-ba folder keeping this name so that the qml script can find it)
+`mkenvimage -r -s 0x20000 -o sam9x60ek/u-boot-env.bin sam9x60ek/bootenv.txt`
+-- TODO: Compile the Microchip forked u-boot with our config.
+
+### Flash details
+- The NAND chip has the following features:
+-- 256KiB block size (also erase block size) (+14K spare)
+-- 4KiB page size (+224 bytes spare/OOB)
+-- No subpage feature, use 4KiB
+-- Sector size: 512
+-- Device size: 2048 blocks
+
+- For PMECC this translates to:
+-- ECC bits: 8
+-- ECC offset: 120
+-- ECC size: 104 (fits in the 224 byte OOB space)
+
+- For UBIFS:
+-- Physical Eraseblock Size: 0x40000 (256KiB)
+-- Subpage size (Keep at 0 for UBI to make it the same as page size)
+-- UBIFS Logical Eraseblock Size: 0x3E000 (248KiB, 8KiB is filesystem overhead)
+-- UBIFS Minimum IO unit: 0x1000 (4096 is page size)
+-- Runtime compression: lxo (can be anything the kernel supports)
+
+- The kernel boot commandline that works with the above (put it in u-boot bootcmd default):
+`console=ttyS0,115200 earlyprintk mtdparts=atmel_nand:256k(bootstrap)ro,768k(uboot)ro,256k(env_redundant),256k(env),512k(dtb),6M(kernel)ro,-(rootfs) ubi.mtd=12 root=ubi0:rootfs rootfstype=ubifs rw rootwait`
+
+### Flashing images using SAM-BA
+
+- sam-ba.exe must be run in the sam-ba folder, just adding the folder as a path does not work because it fetches modules from subfolders
+- Run: `sam-ba.exe -x ./flash.qml` (using my sample flash.qml)
+- The flash.qml file uses *SerialConnection* for USB uploading which is much faster than the J-Link CDC port. For this you must plug a micro-USB cable into USBA/J7 (and no need for a power cord, the board gets power from this micro-USB cable.
+- For DBGU output, you'll need to switch back to the J-Link/J22 micro-USB cable, and add a 5V power to the board as well.
+- If you want to just upload code through the J-Link cable (slower) and not switch back n forth, change *SerialConnection* to *JLinkConnection* in the flash.qml file and run it the same way.
+- The files to upload (uImage, u-boot.bin, rootfs.ubi, u-boot-env.bin, at91bootstrap.bin) must be copied into the sam-ba folder because paths somehow fail for me in the qml file.
