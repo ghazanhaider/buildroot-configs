@@ -87,7 +87,7 @@
 			macb0: ethernet@fffc4000 {
 				phy-mode = "rmii";
 				status = "okay";
-				local-mac-address = [3a 0e 03 04 05 06];
+				local-mac-address = [92 60 BE EF DE AD];
 				#address-cells = <1>;
 				#size-cells = <0>;
 				pinctrl-names = "default";
@@ -98,14 +98,15 @@
 					device_type = "ethernet-phy";
 					interrupt-parent = <&pioA>;
 					interrupts = <7 IRQ_TYPE_EDGE_BOTH>;			
-				};
+				}; 
 			};
 
 			spi0: spi@fffc8000 {
 				cs-gpios = <0>, <&pioC 11 0>, <0>, <0>;
+				status = "okay";
 				flash@1 {
-					compatible = "atmel,at45", "atmel,dataflash";
-					spi-max-frequency = <50000000>;
+					compatible = "atmel,at45db321d", "atmel,at45", "atmel,dataflash";
+					spi-max-frequency = <33000000>;
 					reg = <1>;
 				};
 			};
@@ -151,7 +152,7 @@
 
 		usb0: ohci@500000 {
 			num-ports = <2>;
-			status = "okay";
+		 	status = "okay";
 		};
 		
 		ebi@10000000 {
@@ -164,7 +165,7 @@
 					reg = <0x03 0x00 0x800000>;
 					nand-bus-width = <0x8>;
 					nand-on-flash-bbt;
-					nand-ecc-mode = "none";
+					nand-ecc-mode = "soft";
 					label = "atmel_nand";
 					rb-gpios = <&pioC 13 GPIO_ACTIVE_HIGH>;
 					cs-gpios = <&pioC 14 GPIO_ACTIVE_HIGH>;

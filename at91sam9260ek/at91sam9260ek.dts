@@ -164,7 +164,7 @@
 					reg = <0x03 0x00 0x800000>;
 					nand-bus-width = <0x8>;
 					nand-on-flash-bbt;
-					nand-ecc-mode = "none";
+					nand-ecc-mode = "soft";
 					label = "atmel_nand";
 					rb-gpios = <&pioC 13 GPIO_ACTIVE_HIGH>;
 					cs-gpios = <&pioC 14 GPIO_ACTIVE_HIGH>;

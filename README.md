@@ -10,6 +10,16 @@
 
 - Also git clone At91Bootstrap3 and compile separately, the one that comes with buildroot fails
 
+### Flash details
+
+- K9F2G08U0A Samsung 256Mx8
+- Page: 2k + 64 (0x800)
+- Block Erase: 128k + 4k (0x20000)
+- ECC 1 bit/512 byte?
+- No sub page
+- UBI LEB size: 126976 / 1f000
+
+
 Make all
 
 Fixes:
