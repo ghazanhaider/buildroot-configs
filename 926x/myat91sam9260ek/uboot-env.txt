@@ -1,0 +1,10 @@
+baudrate=115200
+bootargs=root=/dev/sda rootdelay=5
+bootcmd=mw.l 0xFFFFFD08 0xA5000100; mw.l 0xFFFFFD00 0xA5000008;nand read 0x22000000 0x200000 0x6fffff; nand read 0x21000000 0x180000 0x8000; fdt addr 0x21000000; fdt resize; bootm 0x22000000 - 0x21000000
+bootdelay=6
+ethaddr=92:60:BE:EF:DE:AD
+fdtcontroladdr=23ed1d20
+loadaddr=0x21f00000
+stderr=serial@fffff200
+stdin=serial@fffff200
+stdout=serial@fffff200

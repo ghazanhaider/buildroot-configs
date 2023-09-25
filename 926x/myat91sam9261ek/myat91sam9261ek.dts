@@ -222,6 +222,12 @@
 
 					wakeup-source;
 				};
+
+				at73c213@3 {
+					reg = <3>;
+					compatible = "atmel,at73c213";
+					spi-max-frequency = <3000000>;
+				};
 			};
 			
 			i2c0: i2c@fffac000 {

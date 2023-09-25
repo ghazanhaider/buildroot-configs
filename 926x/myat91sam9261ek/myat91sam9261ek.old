@@ -14,7 +14,7 @@
 	compatible = "atmel,at91sam9261ek", "atmel,at91sam9261", "atmel,at91sam9";
 
 	chosen {
-		bootargs = "console=ttyS0,115200 root=/dev/sda rootfstype=ext4 ro rootwait";
+		bootargs = "console=ttyS0,115200 root=/dev/mmcblk0 rootfstype=ext4 ro rootwait";
 		stdout-path = "serial0:115200n8";
 	};
 
@@ -183,17 +183,17 @@
 			};
 
 			mmc0: mmc@fffa8000 {
-                                status = "disabled";
+                                status = "okay";
                                 slot@0 {
                                         reg = <0>;
                                         bus-width = <4>;
-
+                                        // cd-gpios = <&pioC 9 GPIO_ACTIVE_HIGH>;
                                 };
                         };
 
 			spi0: spi@fffc8000 {
-				cs-gpios = <&pioA 3 0>, <0>, <&pioA 28 0>, <&pioA 29 0>;
-				status = "okay";
+				cs-gpios = <&pioA 3 0>, <0>, <&pioA 28 0>, <0>;
+				status = "disabled";
 
 				flash@0 {
 					compatible = "atmel,at45", "atmel,dataflash";
@@ -223,14 +223,6 @@
 					wakeup-source;
 				};
 			};
-			
-			i2c0: i2c@fffac000 {
-				status = "okay";
-			};
-
-			ssc0: ssc@fffbc000 {
-				status = "okay";
-			}; 
 
 			dbgu: serial@fffff200 {
 				status = "okay";

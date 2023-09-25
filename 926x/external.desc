@@ -1,0 +1,2 @@
+name: 926X
+desc: Fixed up config for at91sam9260-ek, at91sam9261-ek, at91sam9g45-ekes for the latest Linux kernel and Buildroot

@@ -1,0 +1,26 @@
+diff --git a/driver/pmc/clk-common.c b/driver/pmc/clk-common.c
+index 2a6a20ed..7d37f460 100644
+--- a/driver/pmc/clk-common.c
++++ b/driver/pmc/clk-common.c
+@@ -46,7 +46,7 @@ void lowlevel_clock_init()
+ 	 */
+ 	pmc_mck_cfg_set(0, AT91C_PMC_CSS_SLOW_CLK, AT91C_PMC_CSS);
+ 
+-#ifdef CONFIG_SAMA5D3X_CMP
++#if defined(CONFIG_SAMA5D3X_CMP) || defined(CONFIG_AT91SAM9260EK)
+ 	/*
+ 	 * On the sama5d3x_cmp board, a phy is not in the proper reset state
+ 	 * after power-up, additional reset
+diff --git a/include/arch/at91_rstc.h b/include/arch/at91_rstc.h
+index 08ff347c..7c490bd7 100644
+--- a/include/arch/at91_rstc.h
++++ b/include/arch/at91_rstc.h
+@@ -58,7 +58,7 @@
+ #define AT91C_RSTC_URSTEN	(0x1UL << 0)
+ #define AT91C_RSTC_URSTIEN	(0x1UL << 4)
+ #define AT91C_RSTC_ERSTL_MASK	(0xFUL << 8)
+-#define AT91C_RSTC_ERSTL(x)	((x) & AT91C_RSTC_ERSTL_MASK << 8)
++#define AT91C_RSTC_ERSTL(x)	((x << 8) & AT91C_RSTC_ERSTL_MASK)
+ #define AT91C_RSTC_RMRKEY_MASK	(0xFFUL << 24)
+ #define		AT91C_RSTC_KEY_UNLOCK		(0xA5UL << 24)
+ 
