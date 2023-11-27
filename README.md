@@ -50,7 +50,12 @@ make O=/926X BR2_EXTERNAL=/root/buildroot-configs/926x/
 - Inspect files as necessary before starting the build:
 ```
 make O=/926X nconfig
+cp ../buildroot-configs/at91sam9260ek/br-config /926X/.config
+make O=/926X nconfig
 make O=/926X at91boostrap3-menuconfig
+cp ../buildroot-configs/926x/myat91sam9260ek/at91bootstrap3-config /9260/build/at91bootstrap3-v3.10.3/.config
+make O=/926X at91boostrap3-menuconfig
+cp myat91sam9260ek/myat91sam9260ek.dts /9260/build/linux-6.4.5/arch/arm/boot/dts/working.dts
 make O=/926X uboot-nconfig
 make O=/926X linux-nconfig
 make O=/926X busybox-nconfig
